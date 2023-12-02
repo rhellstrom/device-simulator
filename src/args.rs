@@ -11,4 +11,8 @@ pub struct Args {
     #[arg(short('r'), long, value_name = "seconds", default_value = "60")]
     pub update_interval: u64,
 
+    /// Port for application to listen on
+    #[arg(short('p'), long, value_name = "port", default_value = "3000")]
+    pub port: u16,
+
 }

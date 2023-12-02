@@ -3,10 +3,11 @@ use std::time::Duration;
 use rand::Rng;
 use tokio::sync::Mutex;
 use tokio::time;
+use serde::Serialize;
 use crate::args::Args;
 use crate::util::get_current_timestamp;
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 struct ConsumptionData {
     timestamp: String,
     /// Power in watts
@@ -33,21 +34,22 @@ impl ConsumptionData {
 }
 
 // Instead of a boolean value if we were to extend status with e.g Low power mode or such
-#[derive(Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub enum StandbyStatus {
     On,
     Off,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Device {
-    id: u16,
+    pub(crate) id: u16,
     name: String,
     power: StandbyStatus,
     total_consumption: f32,
     consumption_data: Vec<ConsumptionData>,
-    //Skip serialization
+    #[serde(skip_serializing)]
     update_interval: u64,
+    #[serde(skip_serializing)]
     max_entries: usize,
 }
 
@@ -95,10 +97,10 @@ pub async fn update_devices(args: Args, devices: Arc<Mutex<Vec<Device>>>){
 pub fn create_default_devices(args: Args) -> Vec<Device> {
     let device_info = [
         (1, "Fridge"),
-        (2, "Freeze"),
+        (2, "Freezer"),
         (3, "EV-Charger"),
         (4, "Water heater"),
-        (5, "Floor heater"),
+        (5, "Bathroom floor heater"),
     ];
 
     device_info
