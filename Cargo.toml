@@ -1,0 +1,12 @@
+[package]
+name = "Device-simulator"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8.5"
+chrono = "0.4.31"
+tokio = { version = "1", features = ["full"] }
+clap = {version = "4", features = ["derive"]}
