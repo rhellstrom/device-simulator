@@ -1,6 +1,6 @@
 use clap:: {Parser};
 
-#[derive(Parser)]
+#[derive(Parser, Clone, Copy)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     /// Maximum number of entries in a device consumption history
