@@ -1,12 +1,13 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
-use axum::{Router};
+use axum::{Json, Router};
 use axum::extract::Path;
 use axum::http::{Response, StatusCode};
-use axum::routing::get;
+use axum::routing::{get, put};
 use clap::Parser;
+use serde_json::Value;
 use tokio::sync::Mutex;
-use crate::device::{create_default_devices, Device, update_devices};
+use crate::device::{create_default_devices, Device, StandbyStatus, update_devices};
 mod device;
 mod util;
 mod args;
@@ -38,7 +39,14 @@ async fn main() {
                 move |path| get_device(path, devices)
             }
         )
-        );
+        )
+        .route(
+        "/devices/:device_id",
+        put({
+            let devices = Arc::clone(&devices);
+            |path, body| update_device_power(path, devices, body)
+        })
+    );
 
 
     let addr = SocketAddr::from(([0, 0, 0, 0], args.port));
@@ -96,4 +104,39 @@ async fn get_device(Path(device_id): Path<String>, devices: Arc<Mutex<Vec<Device
         .status(StatusCode::NOT_FOUND)
         .body("Not found".to_string())
         .unwrap()
+}
+
+async fn update_device_power(Path(device_id): Path<u16>, devices: Arc<Mutex<Vec<Device>>>, new_power_status: Json<Value>) -> Response<String> {
+    // Deserialize payload
+    let power_status = match new_power_status.get("power").and_then(Value::as_str) {
+        Some("On") => StandbyStatus::On,
+        Some("Off") => StandbyStatus::Off,
+        _ => {
+            return Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body("Invalid 'power' value in JSON payload".to_string())
+                .unwrap();
+        }
+    };
+
+    let mut devices = devices.lock().await;
+
+    // Find the device by ID
+    if let Some(device) = devices.iter_mut().find(|d| d.id == device_id) {
+        // Update the power status of the device
+        device.power = power_status;
+
+        // Respond with the updated device JSON
+        Response::builder()
+            .status(StatusCode::OK)
+            .header("content-type", "application/json")
+            .body(serde_json::to_string(&device).unwrap())
+            .unwrap()
+    } else {
+        // Device with the given ID not found
+        Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body("Device Not Found".to_string())
+            .unwrap()
+    }
 }

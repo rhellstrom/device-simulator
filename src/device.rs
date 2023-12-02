@@ -3,7 +3,7 @@ use std::time::Duration;
 use rand::Rng;
 use tokio::sync::Mutex;
 use tokio::time;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use crate::args::Args;
 use crate::util::get_current_timestamp;
 
@@ -34,7 +34,7 @@ impl ConsumptionData {
 }
 
 // Instead of a boolean value if we were to extend status with e.g Low power mode or such
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum StandbyStatus {
     On,
     Off,
@@ -44,7 +44,7 @@ pub enum StandbyStatus {
 pub struct Device {
     pub(crate) id: u16,
     name: String,
-    power: StandbyStatus,
+    pub(crate) power: StandbyStatus,
     total_consumption: f32,
     consumption_data: Vec<ConsumptionData>,
     #[serde(skip_serializing)]
@@ -67,14 +67,15 @@ impl Device {
     }
 
     pub fn on_tick(&mut self) {
-        let new_data = ConsumptionData::simulate_entry(self.update_interval);
-        self.total_consumption += new_data.energy_consumed;
-        self.consumption_data.push(new_data);
+        if self.power == StandbyStatus::On {
+            let new_data = ConsumptionData::simulate_entry(self.update_interval);
+            self.total_consumption += new_data.energy_consumed;
+            self.consumption_data.push(new_data);
 
-        if self.consumption_data.len() >= self.max_entries {
-            self.consumption_data.remove(0); // Remove oldest entry if maximum entries reached
+            if self.consumption_data.len() >= self.max_entries {
+                self.consumption_data.remove(0); // Remove oldest entry if maximum entries reached
+            }
         }
-        println!("{:?}", self);
     }
 }
 
