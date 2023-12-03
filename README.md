@@ -1,34 +1,26 @@
-## Device-simulator
-Quick prototype to simulate smart devices and their energy consumption through HTTP API.
-The idea was that it'd be nice to mimic actual devices, fetch data from them and turn them on/off or some other, unimplemented mode, from our controller board 
+## device-simulator
+A quick prototype that simulates smart devices and their energy consumption through an HTTP API.
 
 ### Features 
-Runs a webserver to mimic smart devices and what their API could potentially look like.
-Data accessible through following endpoints:
+* Web server running to emulate smart devices and their API
+* Access data through the following endpoints
 
 ```
 http://localhost:3000/devices
 ```
-or by device_id
-
 ```
-http://localhost:3000/devices/1
+http://localhost:3000/devices/{device_id}
 ```
-
-### Data structure and the simulated values
-Right now the watts consumed by the devices is a randomly generated value between 50 and 200 and represented as power_usage in the consumption_data entries.
-energy_consumed is the kWh calculated from the watts used. Better values should be implemented once received from customer(?)
-
-### Turn a device On or Off
-In order to mimic control over a smart device, we can PUT to turn on/off a device. If the device is turned off the energy consumption will cease
-
+* Turn a device on or off through a PUT request. When a device has the status "Off" energy simulation is paused
 ```
-curl -X PUT -H "Content-Type: application/json" -d '{"power": "On"}' http://localhost:3000/devices/1
+curl -X PUT -H "Content-Type: application/json" -d '{"power": "On"}' http://localhost:3000/devices/{device_id}
 ```
 ```
-curl -X PUT -H "Content-Type: application/json" -d '{"power": "Off"}' http://localhost:3000/devices/1
+curl -X PUT -H "Content-Type: application/json" -d '{"power": "Off"}' http://localhost:3000/devices/{device_id}
 ``` 
-
+### Simulated values 
+Currently, the power consumed by devices is randomly generated between 50 and 200 watts represented as power_usage in the consumption_data entries. 
+The energy_consumed is calculated in kWh based on the used watts. More accurate values should be implemented if received from the customer.
 
 ### CLI Options 
 ``` 
