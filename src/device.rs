@@ -17,8 +17,7 @@ struct ConsumptionData {
 }
 
 impl ConsumptionData {
-    /// Simulate an entry for consumption_data.
-    /// Parameter interval is given in minutes to calculate kWh per update
+    /// Simulate an entry for consumption_data
     pub fn simulate_entry(interval: u64) -> ConsumptionData {
         let mut rng = rand::thread_rng();
         let timestamp = get_current_timestamp();
