@@ -2,6 +2,7 @@ use std::sync::Arc;
 use axum::extract::Path;
 use axum::http::{Response, StatusCode};
 use axum::Json;
+use log::info;
 use serde_json::Value;
 use tokio::sync::Mutex;
 use crate::device::{Device, StandbyStatus};
@@ -73,9 +74,8 @@ pub async fn update_device_power(Path(device_id): Path<u16>, devices: Arc<Mutex<
 
     // Find the device by ID
     if let Some(device) = devices.iter_mut().find(|d| d.id == device_id) {
-        // Update the power status of the device
         device.power = power_status;
-
+        info!("{} was set to {:?}", device.name, device.power);
         // Respond with the updated device JSON
         Response::builder()
             .status(StatusCode::OK)

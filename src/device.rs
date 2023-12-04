@@ -41,9 +41,9 @@ pub enum StandbyStatus {
 
 #[derive(Serialize, Clone, Debug)]
 pub struct Device {
-    pub(crate) id: u16,
-    name: String,
-    pub(crate) power: StandbyStatus,
+    pub id: u16,
+    pub name: String,
+    pub power: StandbyStatus,
     total_consumption: f32,
     consumption_data: Vec<ConsumptionData>,
     #[serde(skip_serializing)]

@@ -4,6 +4,8 @@ use axum::{Router};
 use axum::routing::{get, put};
 use clap::Parser;
 use tokio::sync::Mutex;
+use log::{debug, error, info};
+use tokio::net::TcpListener;
 use crate::device::{create_default_devices, Device, update_devices};
 use crate::handlers::{get_device, list_devices, update_device_power};
 
@@ -14,6 +16,7 @@ mod handlers;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
     let args = args::Args::parse();
     let init_devices = create_default_devices(args);
     let devices: Arc<Mutex<Vec<Device>>> = Arc::new(Mutex::new(init_devices));
@@ -25,28 +28,33 @@ async fn main() {
     });
 
     let app = Router::new()
-        // Handler for GET /devices
         .route(
-            "/devices", get({
-            let devices = Arc::clone(&devices);
-            move || list_devices(devices)
-        }),
+            "/devices",
+            get({
+                let devices = Arc::clone(&devices);
+                move || list_devices(devices)
+            }),
         )
         .route(
-            "/devices/:device_id", get({
+            "/devices/:device_id",
+            get({
                 let devices = Arc::clone(&devices);
                 move |path| get_device(path, devices)
-            }
-        )
+            }),
         )
         .route(
-        "/devices/:device_id", put({
-            let devices = Arc::clone(&devices);
-            |path, body| update_device_power(path, devices, body)
-        })
-    );
+            "/devices/:device_id",
+            put({
+                let devices = Arc::clone(&devices);
+                |path, body| update_device_power(path, devices, body)
+            }),
+        );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], args.port));
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    if let Ok(listener) = TcpListener::bind(addr).await {
+        info!("Server is running at {}", addr);
+        axum::serve(listener, app).await.unwrap();
+    } else {
+        error!("Failed to bind to address {}", addr);
+    }
 }
