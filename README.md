@@ -1,6 +1,12 @@
 ## device-simulator
 A quick prototype that simulates smart devices and their energy consumption through an HTTP API.
 
+### Run
+To enable logging
+```
+RUST_LOG=trace cargo run
+```
+
 ### Features 
 * Web server running to emulate smart devices and their API
 * Access data through the following endpoints
