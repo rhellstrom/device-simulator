@@ -17,7 +17,7 @@ http://localhost:3000/devices
 ```
 http://localhost:3000/devices/{device_id}
 ```
-* Turn a device on or off through a PUT request. When a device has the status "Off" energy simulation is paused
+* Turn a device on or off through a PATCH request. When a device has the status "Off" energy simulation is paused
 ```
 curl -X PATCH -H "Content-Type: application/json" -d '{"power": "On"}' http://localhost:3000/devices/{device_id}
 ```
