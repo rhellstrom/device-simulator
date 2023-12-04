@@ -19,10 +19,11 @@ http://localhost:3000/devices/{device_id}
 ```
 * Turn a device on or off through a PUT request. When a device has the status "Off" energy simulation is paused
 ```
-curl -X PUT -H "Content-Type: application/json" -d '{"power": "On"}' http://localhost:3000/devices/{device_id}
+curl -X PATCH -H "Content-Type: application/json" -d '{"power": "On"}' http://localhost:3000/devices/{device_id}
 ```
 ```
-curl -X PUT -H "Content-Type: application/json" -d '{"power": "Off"}' http://localhost:3000/devices/{device_id}
+curl -X PATCH -H "Content-Type: application/json" -d '{"power": "Off"}' http://localhost:3000/devices/{device_id}
+
 ``` 
 ### Simulated values 
 Currently, the power consumed by devices is randomly generated between 50 and 200 watts represented as power_usage in the consumption_data entries. 

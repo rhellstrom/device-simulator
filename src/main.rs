@@ -1,10 +1,10 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 use axum::{Router};
-use axum::routing::{get, put};
+use axum::routing::{get, patch};
 use clap::Parser;
 use tokio::sync::Mutex;
-use log::{debug, error, info};
+use log::{error, info};
 use tokio::net::TcpListener;
 use crate::device::{create_default_devices, Device, update_devices};
 use crate::handlers::{get_device, list_devices, update_device_power};
@@ -44,7 +44,7 @@ async fn main() {
         )
         .route(
             "/devices/:device_id",
-            put({
+            patch({
                 let devices = Arc::clone(&devices);
                 |path, body| update_device_power(path, devices, body)
             }),
