@@ -44,7 +44,7 @@ pub struct Device {
     pub id: u16,
     pub name: String,
     pub power: StandbyStatus,
-    total_consumption: f32,
+    pub total_consumption: f32,
     consumption_data: Vec<ConsumptionData>,
     #[serde(skip_serializing)]
     update_interval: u64,
@@ -78,18 +78,15 @@ impl Device {
     }
 }
 
-/// Iterate over devices and start simulation task
 pub async fn update_devices(args: Args, devices: Arc<Mutex<Vec<Device>>>){
     let mut interval = time::interval(Duration::from_secs(args.update_interval));
     loop {
         interval.tick().await;
 
-        //Acquire the lock
         let mut devices_mutex = devices.lock().await;
         for device in devices_mutex.iter_mut(){
             device.on_tick();
         }
-        //Drops lock when we go out of scope
     }
 }
 
