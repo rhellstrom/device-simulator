@@ -2,13 +2,13 @@
 A quick prototype that simulates smart devices and their energy consumption through an HTTP API.
 
 ### Run
-To enable logging
+To run the project with cargo and logging enabled
 ```
 RUST_LOG=trace cargo run
 ```
 
 ### Features 
-* Web server running to emulate smart devices and their API
+* Web server running to simulate smart devices and their potential API
 * Access data through the following endpoints
 
 ```
